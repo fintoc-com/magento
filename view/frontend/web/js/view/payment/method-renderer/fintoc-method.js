@@ -4,14 +4,16 @@ define(
         'Magento_Checkout/js/view/payment/default',
         'Magento_Checkout/js/action/place-order',
         'Magento_Checkout/js/model/payment/additional-validators',
-        'mage/url'
+        'mage/url',
+        'Magento_Customer/js/customer-data'
     ],
     function (
         $,
         Component,
         placeOrderAction,
         additionalValidators,
-        url
+        url,
+        customerData
     ) {
         'use strict';
 
@@ -64,9 +66,22 @@ define(
                                     success: function (response) {
                                         console.log(response);
                                         if (response.success && response.redirect_url) {
+                                            // Reload the cart section from the server
+                                            // (which now has the restored quote) so
+                                            // localStorage has correct data before we
+                                            // leave the page. This ensures the mini-cart
+                                            // shows items if the customer returns without
+                                            // completing payment.
+                                            var redirectUrl = response.redirect_url;
 
-                                            // Redirect to Fintoc checkout page
-                                            window.location.href = response.redirect_url;
+                                            customerData.reload(['cart'], true).always(function () {
+                                                window.location.href = redirectUrl;
+                                            });
+
+                                            // Fallback: redirect after 2s even if reload hangs
+                                            setTimeout(function () {
+                                                window.location.href = redirectUrl;
+                                            }, 2000);
                                         } else {
                                             // Handle error
                                             self.isPlaceOrderActionAllowed(true);

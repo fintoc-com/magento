@@ -25,3 +25,9 @@ if (!$rows) {
         </tbody>
     </table>
 </div>
+<script>
+    require(['Magento_Customer/js/customer-data'], function (customerData) {
+        customerData.invalidate(['cart']);
+        customerData.reload(['cart'], true);
+    });
+</script>

@@ -19,6 +19,8 @@ use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Message\ManagerInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\OrderFactory;
+use Magento\Framework\Stdlib\Cookie\CookieMetadataFactory;
+use Magento\Framework\Stdlib\CookieManagerInterface;
 use Fintoc\Payment\Api\LoggerServiceInterface as LoggerInterface;
 
 /**
@@ -67,6 +69,16 @@ class Commit extends Action
     protected $checkoutSession;
 
     /**
+     * @var CookieManagerInterface
+     */
+    protected $cookieManager;
+
+    /**
+     * @var CookieMetadataFactory
+     */
+    protected $cookieMetadataFactory;
+
+    /**
      * @param Context $context
      * @param RedirectFactory $resultRedirectFactory
      * @param ManagerInterface $messageManager
@@ -76,6 +88,8 @@ class Commit extends Action
      * @param TransactionRepositoryInterface $transactionRepository
      * @param LoggerInterface $logger
      * @param CheckoutSession $checkoutSession
+     * @param CookieManagerInterface $cookieManager
+     * @param CookieMetadataFactory $cookieMetadataFactory
      */
     public function __construct(
         Context                        $context,
@@ -86,7 +100,9 @@ class Commit extends Action
         TransactionServiceInterface    $transactionService,
         TransactionRepositoryInterface $transactionRepository,
         LoggerInterface                $logger,
-        CheckoutSession                $checkoutSession
+        CheckoutSession                $checkoutSession,
+        CookieManagerInterface         $cookieManager,
+        CookieMetadataFactory          $cookieMetadataFactory
     )
     {
         parent::__construct($context);
@@ -98,6 +114,8 @@ class Commit extends Action
         $this->transactionRepository = $transactionRepository;
         $this->logger = $logger;
         $this->checkoutSession = $checkoutSession;
+        $this->cookieManager = $cookieManager;
+        $this->cookieMetadataFactory = $cookieMetadataFactory;
     }
 
     /**
@@ -231,11 +249,51 @@ class Commit extends Action
             ]
         );
 
+        // Deactivate the quote and clear it from the session so the cart
+        // shows empty after successful payment. The quote was kept alive
+        // during the redirect (restored in Create controller).
+        try {
+            $quote = $this->checkoutSession->getQuote();
+            if ($quote && $quote->getId()) {
+                $quote->setIsActive(false);
+                $quote->save();
+            }
+            $this->checkoutSession->clearQuote();
+            $this->checkoutSession->setQuoteId(null);
+        } catch (Exception $e) {
+            $this->logger->debug('Commit: deactivate quote failed: ' . $e->getMessage());
+        }
+
+        // Set order in session so the success page can display it
+        $this->checkoutSession->setLastSuccessQuoteId($order->getQuoteId());
+        $this->checkoutSession->setLastQuoteId($order->getQuoteId());
+        $this->checkoutSession->setLastOrderId($order->getId());
+        $this->checkoutSession->setLastRealOrderId($order->getIncrementId());
+
         // Add a success message
         $this->messageManager->addSuccessMessage(__('Your payment was successful.'));
 
         // Redirect to success page
         return $resultRedirect->setPath('checkout/onepage/success');
+    }
+
+    /**
+     * Bump the private_content_version cookie so the frontend JS
+     * reloads customer-data sections (including the mini-cart).
+     */
+    private function bumpPrivateContentVersion(): void
+    {
+        $metadata = $this->cookieMetadataFactory->createPublicCookieMetadata()
+            ->setDuration(315360000)
+            ->setPath('/')
+            ->setHttpOnly(false)
+            ->setSameSite('Lax');
+
+        $this->cookieManager->setPublicCookie(
+            'private_content_version',
+            md5((string) rand() . time()),
+            $metadata
+        );
     }
 
     /**

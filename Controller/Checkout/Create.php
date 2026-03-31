@@ -23,6 +23,8 @@ use Magento\Store\Model\StoreManagerInterface;
 use Fintoc\Payment\Api\LoggerServiceInterface as LoggerInterface;
 use Fintoc\Payment\Service\ConfigurationService;
 use Fintoc\Payment\Api\Checkout\RequestBuilderInterface;
+use Magento\Framework\Stdlib\Cookie\CookieMetadataFactory;
+use Magento\Framework\Stdlib\CookieManagerInterface;
 
 /**
  * Controller for creating Fintoc checkout sessions
@@ -75,6 +77,16 @@ class Create extends Action
     protected $requestBuilder;
 
     /**
+     * @var CookieManagerInterface
+     */
+    protected $cookieManager;
+
+    /**
+     * @var CookieMetadataFactory
+     */
+    protected $cookieMetadataFactory;
+
+    /**
      * @param Context $context
      * @param JsonFactory $resultJsonFactory
      * @param CheckoutSession $checkoutSession
@@ -85,6 +97,8 @@ class Create extends Action
      * @param EncryptorInterface $encryptor
      * @param TransactionServiceInterface $transactionService
      * @param RequestBuilderInterface $requestBuilder
+     * @param CookieManagerInterface $cookieManager
+     * @param CookieMetadataFactory $cookieMetadataFactory
      */
     public function __construct(
         Context                       $context,
@@ -96,7 +110,9 @@ class Create extends Action
         LoggerInterface               $logger,
         EncryptorInterface            $encryptor,
         TransactionServiceInterface   $transactionService,
-        RequestBuilderInterface        $requestBuilder
+        RequestBuilderInterface       $requestBuilder,
+        CookieManagerInterface        $cookieManager,
+        CookieMetadataFactory         $cookieMetadataFactory
     ) {
         parent::__construct($context);
         $this->resultJsonFactory = $resultJsonFactory;
@@ -108,6 +124,8 @@ class Create extends Action
         $this->encryptor = $encryptor;
         $this->transactionService = $transactionService;
         $this->requestBuilder = $requestBuilder;
+        $this->cookieManager = $cookieManager;
+        $this->cookieMetadataFactory = $cookieMetadataFactory;
     }
 
     /**
@@ -252,6 +270,17 @@ class Create extends Action
 
             // Log the response
             $this->logger->debug('Fintoc checkout session response', ['response' => $response]);
+
+            // Restore the quote so the cart stays alive while the customer
+            // is on the Fintoc payment page.  If they hit the browser back
+            // button the cart will naturally still have items.  The quote is
+            // deactivated later by the Commit controller on successful payment.
+            try {
+                $this->checkoutSession->restoreQuote();
+                $this->logger->info('Create: restored quote for order ' . $order->getIncrementId());
+            } catch (Exception $ex) {
+                $this->logger->debug('Create: restoreQuote after redirect URL: ' . $ex->getMessage());
+            }
 
             if (!isset($response['redirect_url'])) {
                 // Add comment to order history

@@ -54,6 +54,13 @@
             </comment>
             <config_path>payment/fintoc_payment/max_order_amount</config_path>
         </field>
+        <field id="payment_method_types" translate="label comment" type="multiselect" sortOrder="95"
+               showInDefault="1" showInWebsite="1" showInStore="0" canRestore="1">
+            <label>Payment Methods</label>
+            <comment>Select which payment methods to offer at checkout. If none selected, only bank transfer will be available.</comment>
+            <source_model>Fintoc\Payment\Model\Config\Source\PaymentMethodTypes</source_model>
+            <config_path>payment/fintoc_payment/payment_method_types</config_path>
+        </field>
         <field id="sort_order" translate="label" type="text" sortOrder="100" showInDefault="1"
                showInWebsite="1"
                showInStore="0" canRestore="1">

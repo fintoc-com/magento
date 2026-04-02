@@ -116,6 +116,14 @@ interface ConfigurationServiceInterface
     public function getMaxOrderAmount(?string $scopeCode = null): ?float;
 
     /**
+     * Get enabled payment method types for checkout sessions.
+     *
+     * @param string|null $scopeCode
+     * @return array
+     */
+    public function getPaymentMethodTypes(?string $scopeCode = null): array;
+
+    /**
      * Get sort order
      *
      * @param string|null $scopeCode

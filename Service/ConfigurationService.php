@@ -38,6 +38,7 @@ class ConfigurationService implements ConfigurationServiceInterface
     private const XML_PATH_DEBUG_LEVEL = 'payment/fintoc_payment/debug_level';
     private const XML_PATH_LOG_SENSITIVE_DATA = 'payment/fintoc_payment/log_sensitive_data';
     private const XML_PATH_MAX_ORDER_AMOUNT = 'payment/fintoc_payment/max_order_amount';
+    private const XML_PATH_PAYMENT_METHOD_TYPES = 'payment/fintoc_payment/payment_method_types';
     private const XML_PATH_SORT_ORDER = 'payment/fintoc_payment/sort_order';
 
     /**
@@ -191,6 +192,15 @@ class ConfigurationService implements ConfigurationServiceInterface
     {
         $value = $this->getConfig(self::XML_PATH_MAX_ORDER_AMOUNT, ScopeInterface::SCOPE_STORE, $scopeCode);
         return $value !== null && $value !== '' ? (float)$value : null;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getPaymentMethodTypes(?string $scopeCode = null): array
+    {
+        $value = $this->getConfig(self::XML_PATH_PAYMENT_METHOD_TYPES, ScopeInterface::SCOPE_STORE, $scopeCode);
+        return $value ? explode(',', $value) : ['bank_transfer'];
     }
 
     /**

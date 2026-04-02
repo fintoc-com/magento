@@ -7,6 +7,7 @@ namespace Fintoc\Payment\Service\Checkout;
 
 use Fintoc\Payment\Api\Checkout\MetadataBuilderInterface;
 use Fintoc\Payment\Api\Checkout\RequestBuilderInterface;
+use Fintoc\Payment\Api\ConfigurationServiceInterface;
 use Fintoc\Payment\Utils\AmountUtils;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Store\Model\StoreManagerInterface;
@@ -25,16 +26,22 @@ class RequestBuilder implements RequestBuilderInterface
     /** @var MetadataBuilderInterface */
     private $metadataBuilder;
 
+    /** @var ConfigurationServiceInterface */
+    private $configService;
+
     /**
      * @param StoreManagerInterface $storeManager
      * @param MetadataBuilderInterface $metadataBuilder
+     * @param ConfigurationServiceInterface $configService
      */
     public function __construct(
         StoreManagerInterface $storeManager,
-        MetadataBuilderInterface $metadataBuilder
+        MetadataBuilderInterface $metadataBuilder,
+        ConfigurationServiceInterface $configService
     ) {
         $this->storeManager = $storeManager;
         $this->metadataBuilder = $metadataBuilder;
+        $this->configService = $configService;
     }
 
     /**
@@ -51,6 +58,7 @@ class RequestBuilder implements RequestBuilderInterface
             'success_url' => $baseUrl . 'fintoc/checkout/commit/action/success/tr/' . rawurlencode($transactionId),
             'customer_email' => $order->getCustomerEmail(),
             'metadata' => $this->metadataBuilder->build($order, $transactionId),
+            'payment_method_types' => $this->configService->getPaymentMethodTypes(),
         ];
 
         // Hook point: Plugins may add/edit/remove top-level payload keys here.

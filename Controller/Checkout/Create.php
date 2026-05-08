@@ -285,6 +285,12 @@ class Create extends Action
                 throw new LocalizedException(__('Invalid response from Fintoc API'));
             }
 
+            try {
+                $this->checkoutSession->restoreQuote();
+            } catch (Exception $ex) {
+                $this->logger->debug('Restore quote before redirect failed: ' . $ex->getMessage());
+            }
+
             return $result->setData([
                 'success' => true,
                 'redirect_url' => $response['redirect_url']

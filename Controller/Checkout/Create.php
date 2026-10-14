@@ -29,6 +29,8 @@ use Fintoc\Payment\Api\Checkout\RequestBuilderInterface;
  */
 class Create extends Action
 {
+    public const API_VERSION = '2026-02-01';
+
     /**
      * @var JsonFactory
      */
@@ -128,7 +130,7 @@ class Create extends Action
 
             $apiSecret = $this->getApiSecret();
             $apiBaseUrl = rtrim((string)$this->configService->getConfig('payment/fintoc_payment/api_base_url') ?: ConfigurationService::DEFAULT_API_BASE_URL, '/');
-            $checkoutEndpoint = $apiBaseUrl . '/v1/checkout_sessions';
+            $checkoutEndpoint = $apiBaseUrl . '/v2/checkout_sessions';
 
             // Generate a unique transaction ID
             $transactionId = uniqid('fintoc_', true);
@@ -168,6 +170,7 @@ class Create extends Action
             $options = [
                 'headers' => [
                     'Authorization' => 'Bearer '.$apiSecret,
+                    'Fintoc-Version' => self::API_VERSION,
                     'Accept' => 'application/json',
                     'Content-Type' => 'application/json'
                 ],

@@ -19,7 +19,7 @@ class AmountUtils
      * @param float|int $amount
      * @return int
      */
-    public static function roundToIntHalfUp($amount): int
+    private static function roundToIntHalfUp($amount): int
     {
         return (int)\round((float)$amount, 0, PHP_ROUND_HALF_UP);
     }

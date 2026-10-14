@@ -45,7 +45,7 @@ class RequestBuilder implements RequestBuilderInterface
         $baseUrl = $this->storeManager->getStore()->getBaseUrl();
 
         $payload = [
-            'amount' => AmountUtils::roundToIntHalfUp((float) $order->getGrandTotal()),
+            'amount' => AmountUtils::toMinorUnits($order->getGrandTotal(), $order->getOrderCurrencyCode()),
             'currency' => $order->getOrderCurrencyCode(),
             'cancel_url' => $baseUrl . 'fintoc/checkout/commit/action/cancel/tr/' . rawurlencode($transactionId),
             'success_url' => $baseUrl . 'fintoc/checkout/commit/action/success/tr/' . rawurlencode($transactionId),

@@ -154,7 +154,7 @@ class PaymentIntentSucceededHandler extends AbstractPaymentIntentHandler
             __(
                 'Fintoc payment succeeded. ID: %1, Amount: %2 %3, Ref: %4',
                 $pi['id'] ?? 'N/A',
-                $pi['amount'] ?? 'N/A',
+                $this->getMajorAmount($pi) ?? 'N/A',
                 $pi['currency'] ?? '',
                 $pi['referenceId'] ?? 'N/A'
             )

@@ -8,6 +8,7 @@ use Fintoc\Payment\Api\TransactionRepositoryInterface;
 use Fintoc\Payment\Api\TransactionServiceInterface;
 use Fintoc\Payment\Service\Webhook\WebhookConstants;
 use Fintoc\Payment\Service\Webhook\WebhookEvent;
+use Fintoc\Payment\Utils\AmountUtils;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Quote\Api\CartRepositoryInterface;
@@ -205,5 +206,20 @@ abstract class AbstractWebhookHandler
             }
         }
         $payment->save();
+    }
+
+    /**
+     * Amount of a Fintoc resource in major units of its currency.
+     *
+     * @param array $resource
+     * @param string|null $fallbackCurrency
+     * @return float|null
+     */
+    protected function getMajorAmount(array $resource, ?string $fallbackCurrency = null): ?float
+    {
+        if (!isset($resource['amount'])) {
+            return null;
+        }
+        return AmountUtils::fromMinorUnits($resource['amount'], $resource['currency'] ?? $fallbackCurrency);
     }
 }

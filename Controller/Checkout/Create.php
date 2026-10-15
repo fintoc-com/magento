@@ -23,6 +23,7 @@ use Magento\Store\Model\StoreManagerInterface;
 use Fintoc\Payment\Api\LoggerServiceInterface as LoggerInterface;
 use Fintoc\Payment\Service\ConfigurationService;
 use Fintoc\Payment\Api\Checkout\RequestBuilderInterface;
+use Fintoc\Payment\Service\Checkout\KnownPaymentMethods;
 
 /**
  * Controller for creating Fintoc checkout sessions
@@ -77,6 +78,11 @@ class Create extends Action
     protected $requestBuilder;
 
     /**
+     * @var KnownPaymentMethods
+     */
+    protected $knownPaymentMethods;
+
+    /**
      * @param Context $context
      * @param JsonFactory $resultJsonFactory
      * @param CheckoutSession $checkoutSession
@@ -87,6 +93,7 @@ class Create extends Action
      * @param EncryptorInterface $encryptor
      * @param TransactionServiceInterface $transactionService
      * @param RequestBuilderInterface $requestBuilder
+     * @param KnownPaymentMethods $knownPaymentMethods
      */
     public function __construct(
         Context                       $context,
@@ -98,7 +105,8 @@ class Create extends Action
         LoggerInterface               $logger,
         EncryptorInterface            $encryptor,
         TransactionServiceInterface   $transactionService,
-        RequestBuilderInterface        $requestBuilder
+        RequestBuilderInterface        $requestBuilder,
+        KnownPaymentMethods           $knownPaymentMethods
     ) {
         parent::__construct($context);
         $this->resultJsonFactory = $resultJsonFactory;
@@ -110,6 +118,7 @@ class Create extends Action
         $this->encryptor = $encryptor;
         $this->transactionService = $transactionService;
         $this->requestBuilder = $requestBuilder;
+        $this->knownPaymentMethods = $knownPaymentMethods;
     }
 
     /**
@@ -187,6 +196,9 @@ class Create extends Action
 
                 // Get the response
                 $response = json_decode($response->getBody()->getContents(), true);
+                if (is_array($response)) {
+                    $this->knownPaymentMethods->saveFromSession($response);
+                }
 
                 // Update transaction with response data
                 $this->transactionService->createPostAuthorizationTransaction(

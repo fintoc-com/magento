@@ -37,6 +37,26 @@ define(
             },
 
             /**
+             * Get the title built from the organization's payment methods
+             * @returns {String}
+             */
+            getTitle: function () {
+                var config = window.checkoutConfig.payment[this.getCode()];
+
+                return config && config.title ? config.title : this._super();
+            },
+
+            /**
+             * Get the text shown under the title
+             * @returns {String}
+             */
+            getSubtitle: function () {
+                var config = window.checkoutConfig.payment[this.getCode()];
+
+                return config ? config.subtitle : '';
+            },
+
+            /**
              * Place order handler
              */
             placeOrder: function (data, event) {

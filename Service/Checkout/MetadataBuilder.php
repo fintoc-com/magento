@@ -23,6 +23,7 @@ class MetadataBuilder implements MetadataBuilderInterface
     {
         $metadata = [
             'ecommerce_order_id' => $order->getIncrementId(),
+            'source' => 'magento',
         ];
 
         // Hook point: Plugins may add/edit/remove metadata keys here.

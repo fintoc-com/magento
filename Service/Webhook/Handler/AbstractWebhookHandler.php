@@ -127,6 +127,14 @@ abstract class AbstractWebhookHandler
             $quoteId = (int)$order->getQuoteId();
             if ($quoteId) {
                 $quote = $this->cartRepository->get($quoteId);
+                $reservedOrderId = (string)$quote->getReservedOrderId();
+                if ($reservedOrderId !== '' && $reservedOrderId !== $order->getIncrementId()) {
+                    $this->logger->info('Quote not restored: a newer order already used it', [
+                        'order' => $order->getIncrementId(),
+                        'newer_order' => $reservedOrderId
+                    ]);
+                    return;
+                }
                 if ($quote && $quote->getId()) {
                     $quote->setIsActive(true);
                     $quote->setReservedOrderId(null);

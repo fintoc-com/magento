@@ -51,7 +51,7 @@ class PaymentIntentFailedHandler extends AbstractPaymentIntentHandler
             __(
                 'Fintoc payment failed. ID: %1, Amount: %2 %3, Status: %4%5',
                 $pi['id'] ?? 'N/A',
-                $pi['amount'] ?? 'N/A',
+                $this->getMajorAmount($pi) ?? 'N/A',
                 $pi['currency'] ?? '',
                 $pi['status'] ?? 'failed',
                 $error ? (': ' . $error) : ''

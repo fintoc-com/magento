@@ -158,7 +158,7 @@ class Fintoc extends Info
                 return number_format($amount, 2) . (isset($ai['fintoc_currency']) ? ' ' . $ai['fintoc_currency'] : '');
             }
             if (isset($ai['fintoc_payment_amount'])) {
-                $amount = ((float)$ai['fintoc_payment_amount']) / 100;
+                $amount = (float)$ai['fintoc_payment_amount'];
                 return number_format($amount, 2) . (isset($ai['fintoc_payment_currency']) ? ' ' . $ai['fintoc_payment_currency'] : '');
             }
         }

@@ -33,7 +33,7 @@ class CheckoutSessionExpiredHandler extends AbstractWebhookHandler
 
         // Upsert or update transaction as canceled and append payload
         $externalId = (string)($session['id'] ?? ('cs_' . uniqid()));
-        $amount = isset($session['amount']) ? ((float)$session['amount']) / 100 : null;
+        $amount = $this->getMajorAmount($session, $order->getOrderCurrencyCode());
         $currency = $session['currency'] ?? $order->getOrderCurrencyCode();
         $this->upsertAndAppendTransactionRaw(
             $order,

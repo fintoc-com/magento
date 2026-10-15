@@ -58,7 +58,7 @@ class RefundsApiClient implements RefundsApiClientInterface
             'resource_id' => $paymentIntentId,
         ];
         if ($amount !== null) {
-            $payload['amount'] = AmountUtils::roundToIntHalfUp((float)$amount);
+            $payload['amount'] = AmountUtils::toMinorUnits($amount, $currency);
         }
         if (!empty($normalizedMeta)) {
             $payload['metadata'] = $normalizedMeta;

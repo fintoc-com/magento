@@ -57,7 +57,7 @@ class RefundFailedHandler extends AbstractWebhookHandler
             }
         }
 
-        $amount = $refund['amount'] ?? null;
+        $amount = $this->getMajorAmount($refund);
         $currency = $refund['currency'] ?? null;
         $order->addCommentToStatusHistory(
             __(

@@ -55,7 +55,7 @@ abstract class AbstractPaymentIntentHandler extends AbstractWebhookHandler
         $created = $this->transactionService->createWebhookTransaction(
             (string)($pi['id'] ?? ('pi_' . uniqid())),
             $order,
-            $pi['amount'] ?? null,
+            $this->getMajorAmount($pi, $order->getOrderCurrencyCode()),
             $pi['currency'] ?? $order->getOrderCurrencyCode(),
             [],
             $status,
@@ -89,7 +89,7 @@ abstract class AbstractPaymentIntentHandler extends AbstractWebhookHandler
         $data = array_merge([
             'fintoc_payment_id' => $pi['id'] ?? null,
             'fintoc_payment_status' => $pi['status'] ?? null,
-            'fintoc_payment_amount' => $pi['amount'] ?? null,
+            'fintoc_payment_amount' => $this->getMajorAmount($pi),
             'fintoc_payment_currency' => $pi['currency'] ?? null,
             'fintoc_payment_type' => $pi['paymentType'] ?? null,
             'fintoc_reference_id' => $pi['referenceId'] ?? null,

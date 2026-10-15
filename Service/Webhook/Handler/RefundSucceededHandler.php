@@ -66,7 +66,7 @@ class RefundSucceededHandler extends AbstractWebhookHandler
         $order = $this->loadOrderOrFail($orderId);
 
         $refundId = (string)($refund['id'] ?? '');
-        $amount = $refund['amount'] ?? null;
+        $amount = $this->getMajorAmount($refund);
         $currency = $refund['currency'] ?? null;
 
         // Update transaction to success and append payload

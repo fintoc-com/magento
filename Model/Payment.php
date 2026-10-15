@@ -78,7 +78,7 @@ class Payment extends AbstractMethod
     /**
      * @var string[]
      */
-    protected $supportedCurrencyCodes = ['CLP'];
+    protected $supportedCurrencyCodes = ['CLP', 'MXN'];
 
     /**
      * @var ConfigurationServiceInterface

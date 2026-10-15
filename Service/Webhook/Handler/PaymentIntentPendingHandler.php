@@ -39,7 +39,7 @@ class PaymentIntentPendingHandler extends AbstractPaymentIntentHandler
             __(
                 'Fintoc payment pending. ID: %1%2',
                 $pi['id'] ?? 'N/A',
-                isset($pi['amount'], $pi['currency']) ? __(', Amount: %1 %2', $pi['amount'], $pi['currency']) : ''
+                isset($pi['amount'], $pi['currency']) ? __(', Amount: %1 %2', $this->getMajorAmount($pi), $pi['currency']) : ''
             )
         );
         $order->save();

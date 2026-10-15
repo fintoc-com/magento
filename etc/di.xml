@@ -78,14 +78,6 @@
         </arguments>
     </virtualType>
 
-    <type name="Magento\Checkout\Model\CompositeConfigProvider">
-        <arguments>
-            <argument name="configProviders" xsi:type="array">
-                <item name="fintoc_payment_config_provider" xsi:type="object">Fintoc\Payment\Model\Ui\ConfigProvider</item>
-            </argument>
-        </arguments>
-    </type>
-
     <!-- Logger Configuration -->
     <type name="Fintoc\Payment\Logger\Handler">
         <arguments>

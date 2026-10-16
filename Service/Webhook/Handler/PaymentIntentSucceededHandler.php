@@ -160,6 +160,10 @@ class PaymentIntentSucceededHandler extends AbstractPaymentIntentHandler
             )
         );
 
+        if ($order->canUnhold()) {
+            $order->unhold();
+        }
+
         // Create invoice
         try {
             if ($order->canInvoice() && $this->configService->getPaymentAction() == PaymentAction::ACTION_AUTHORIZE_CAPTURE) {

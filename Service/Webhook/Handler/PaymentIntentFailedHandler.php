@@ -46,6 +46,9 @@ class PaymentIntentFailedHandler extends AbstractPaymentIntentHandler
             'fintoc_failed_at' => date('Y-m-d H:i:s'),
         ]);
 
+        if ($order->canUnhold()) {
+            $order->unhold();
+        }
         $order->cancel();
         $order->addCommentToStatusHistory(
             __(

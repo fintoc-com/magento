@@ -177,64 +177,31 @@ class Commit extends Action
     {
         $resultRedirect = $this->resultRedirectFactory->create();
 
-        // Update transaction status
-        $this->transactionService->updateTransactionStatus(
-            $transaction,
-            TransactionInterface::STATUS_SUCCESS,
-            [
-                'updated_by' => 'commit_controller',
-                'error_message' => null
-            ]
-        );
-
-        // Add comment to order history
-        $order->addCommentToStatusHistory(
-            __(
-                'Fintoc payment successful. Transaction ID: %1, Amount: %2 %3',
-                $transaction->getTransactionId(),
-                $transaction->getAmount(),
-                $transaction->getCurrency()
-            )
-        );
-
-        // Add additional payment information
-        $payment = $order->getPayment();
-        $payment->setAdditionalInformation('fintoc_transaction_status', TransactionInterface::STATUS_SUCCESS);
-        $payment->setAdditionalInformation('fintoc_transaction_completed_at', date('Y-m-d H:i:s'));
-
-        // Store transaction response data if available
-        $responseData = $transaction->getResponseData();
-        if ($responseData) {
+        if ($order->getState() === Order::STATE_CANCELED) {
+            $this->messageManager->addErrorMessage(__('Your Fintoc payment could not be completed. Please try again.'));
             try {
-                $responseArray = json_decode($responseData, true);
-                if (is_array($responseArray)) {
-                    foreach ($responseArray as $key => $value) {
-                        if (is_scalar($value)) {
-                            $payment->setAdditionalInformation('fintoc_response_' . $key, $value);
-                        }
-                    }
-                }
+                $this->checkoutSession->restoreQuote();
             } catch (Exception $e) {
-                $this->logger->error('Commit: Error processing response data: ' . $e->getMessage());
+                $this->logger->debug('Commit: Restore quote failed: ' . $e->getMessage());
             }
+            return $resultRedirect->setPath('checkout/cart');
         }
 
-        $payment->save();
-        $order->save();
+        if (in_array($order->getState(), [Order::STATE_PROCESSING, Order::STATE_COMPLETE], true)) {
+            $this->messageManager->addSuccessMessage(__('Your payment was successful.'));
+            return $resultRedirect->setPath('checkout/onepage/success');
+        }
 
-        // Log the success
+        $this->messageManager->addNoticeMessage(__('Thanks! We are confirming your payment with Fintoc and will update your order shortly.'));
+
         $this->logger->info(
-            'Commit: Fintoc payment successful',
+            'Commit: consumer returned before the payment was confirmed',
             [
                 'transaction_id' => $transaction->getTransactionId(),
                 'order_id' => $order->getIncrementId()
             ]
         );
 
-        // Add a success message
-        $this->messageManager->addSuccessMessage(__('Your payment was successful.'));
-
-        // Redirect to success page
         return $resultRedirect->setPath('checkout/onepage/success');
     }
 

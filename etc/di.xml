@@ -40,6 +40,7 @@
                 <item name="refund.in_progress" xsi:type="object">Fintoc\Payment\Service\Webhook\Handler\RefundInProgressHandler</item>
                 <item name="payment_intent.succeeded" xsi:type="object">Fintoc\Payment\Service\Webhook\Handler\PaymentIntentSucceededHandler</item>
                 <item name="payment_intent.failed" xsi:type="object">Fintoc\Payment\Service\Webhook\Handler\PaymentIntentFailedHandler</item>
+                <item name="payment_intent.expired" xsi:type="object">Fintoc\Payment\Service\Webhook\Handler\PaymentIntentFailedHandler</item>
                 <item name="payment_intent.pending" xsi:type="object">Fintoc\Payment\Service\Webhook\Handler\PaymentIntentPendingHandler</item>
                 <item name="checkout_session.finished" xsi:type="object">Fintoc\Payment\Service\Webhook\Handler\CheckoutSessionFinishedHandler</item>
                 <item name="checkout_session.expired" xsi:type="object">Fintoc\Payment\Service\Webhook\Handler\CheckoutSessionExpiredHandler</item>

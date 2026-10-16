@@ -154,3 +154,12 @@
 "Select which order statuses are eligible to be refunded.","Selecciona qué estados de pedido son elegibles para reembolso."
 
 "Please enter a reason/comment for this refund.","Ingresa un motivo/comentario para este reembolso."
+"SPEI","SPEI"
+"your bank","tu banco"
+"card","tarjeta"
+"cash","efectivo"
+"%1 or %2","%1 o %2"
+"Pay with %1","Paga con %1"
+"Credit or debit card","Tarjeta de crédito o débito"
+"Pay in cash","Paga en efectivo"
+"With Fintoc","Con Fintoc"

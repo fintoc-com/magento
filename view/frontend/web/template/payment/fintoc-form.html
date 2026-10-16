@@ -5,8 +5,29 @@
                class="radio"
                data-bind="attr: {'id': getCode()}, value: getCode(), checked: isChecked, click: selectPaymentMethod, visible: isRadioButtonVisible()"/>
         <label data-bind="attr: {'for': getCode()}" class="label">
-            <span data-bind="html: getTitle()"></span>
-            <img src="https://assets.fintoc.com/?img_name=combo_cl_light">
+            <span style="display: inline-flex; flex-direction: column; vertical-align: middle;">
+                <span data-bind="html: getTitle()"></span>
+                <span data-bind="text: getSubtitle()" style="font-size: 12px; color: #6d6d6d;"></span>
+            </span>
+            <!-- ko if: getComboLogo() -->
+            <img data-bind="attr: {src: getComboLogo()}" alt="Fintoc" style="vertical-align: middle; margin-left: 8px;"/>
+            <!-- /ko -->
+            <!-- ko ifnot: getComboLogo() -->
+            <span style="display: inline-flex; align-items: center; gap: 8px; vertical-align: middle; margin-left: 8px;">
+                <span style="display: inline-flex; flex-direction: column; align-items: center; gap: 4px;">
+                    <!-- ko foreach: getLogoRows() -->
+                    <span style="display: flex; gap: 4px;">
+                        <!-- ko foreach: $data -->
+                        <img data-bind="attr: {src: $data}" alt="" style="height: 28px; width: auto; display: block;"/>
+                        <!-- /ko -->
+                    </span>
+                    <!-- /ko -->
+                </span>
+                <!-- ko if: getBrandLogo() -->
+                <img data-bind="attr: {src: getBrandLogo()}" alt="Fintoc" style="height: 51px; width: auto;"/>
+                <!-- /ko -->
+            </span>
+            <!-- /ko -->
         </label>
     </div>
     <div class="payment-method-content">

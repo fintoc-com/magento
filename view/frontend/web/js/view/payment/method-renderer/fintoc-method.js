@@ -37,6 +37,57 @@ define(
             },
 
             /**
+             * Get the title built from the organization's payment methods
+             * @returns {String}
+             */
+            getTitle: function () {
+                var config = window.checkoutConfig.payment[this.getCode()];
+
+                return config && config.title ? config.title : this._super();
+            },
+
+            /**
+             * Get the text shown under the title
+             * @returns {String}
+             */
+            getSubtitle: function () {
+                var config = window.checkoutConfig.payment[this.getCode()];
+
+                return config ? config.subtitle : '';
+            },
+
+            /**
+             * Get the official image for bank transfer only checkouts
+             * @returns {String|null}
+             */
+            getComboLogo: function () {
+                var config = window.checkoutConfig.payment[this.getCode()];
+
+                return config ? config.comboLogo : null;
+            },
+
+            /**
+             * Get the payment method logos, grouped in rows
+             * @returns {Array}
+             */
+            getLogoRows: function () {
+                var config = window.checkoutConfig.payment[this.getCode()];
+
+                return config && config.logoRows ? config.logoRows : [];
+            },
+
+            /**
+             * Get the vertical Fintoc logo shown next to two rows of logos
+             * @returns {String|null}
+             */
+            getBrandLogo: function () {
+                var config = window.checkoutConfig.payment[this.getCode()];
+
+                return config ? config.brandLogo : null;
+            },
+
+
+            /**
              * Place order handler
              */
             placeOrder: function (data, event) {

@@ -46,7 +46,7 @@ class CheckoutSessionFinishedHandler extends AbstractWebhookHandler
      */
     private function holdForCashPayment(Order $order): void
     {
-        if ($order->canHold()) {
+        if (in_array($order->getState(), [Order::STATE_NEW, Order::STATE_PENDING_PAYMENT], true) && $order->canHold()) {
             $order->hold();
             $order->addCommentToStatusHistory(__('Fintoc cash payment pending. The order is on hold until the consumer pays at the store.'));
             $order->save();

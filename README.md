@@ -147,6 +147,41 @@ Error responses:
 - If refunds fail with client errors, check the payload mapping (resource_id/resource_type) and that API Base URL and endpoints match your Fintoc environment.
 
 ## Development notes
+### Reproducible development dependencies
+
+`composer.lock` records exact direct and transitive dependency versions for
+standalone development with PHP 8.2. Committing it makes local and CI installations
+reproducible, gives tests and dependency audits a consistent baseline, and makes
+dependency updates explicit in code review.
+
+When this module is installed as a dependency in a Magento store, Composer uses the
+store's root requirements, repositories and lockfile instead. This module's lockfile
+does not describe or control the versions installed in a merchant's store.
+
+For standalone development, `composer.json` uses the public Mage-OS mirror only for
+`magento/framework`, which is not available on Packagist. Other packages are resolved
+from Packagist. No Adobe Marketplace credentials are needed for this snapshot.
+
+Install the snapshot with PHP 8.2 and the extensions required by Magento:
+
+```sh
+composer install --no-plugins --no-scripts
+composer validate --no-check-publish --no-plugins
+```
+
+To update dependencies intentionally, run the following with PHP 8.2, review the
+lockfile diff, reinstall, and rerun the relevant tests and dependency audit before
+committing `composer.lock`:
+
+```sh
+composer update --no-install --no-plugins --no-scripts
+```
+
+Plugins and scripts are disabled because this checkout is a module, not a Magento
+store. Magento-dependent tests still require a full Magento installation (see below).
+
+### Module conventions
+
 - HTTP client: GuzzleHttp (configured via DI with sensible timeouts and disabled `http_errors`).
 - DI preference maps `GuzzleHttp\\ClientInterface` to `GuzzleHttp\\Client` to support both Guzzle 6 and 7; only `ClientInterface` is type-hinted in services.
 - Configuration is centralized in `Fintoc\Payment\Service\ConfigurationService` (do not inject `ScopeConfigInterface` directly).
